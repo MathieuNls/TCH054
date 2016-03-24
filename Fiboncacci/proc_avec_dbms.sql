@@ -20,3 +20,7 @@ exception
 when others then
 dbms_output.put_line(sqlerrm);
 end;
+
+/*APPEL
+EXECUTE Fibonacci_Series(20)
+*/
