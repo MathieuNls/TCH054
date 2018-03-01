@@ -143,3 +143,27 @@ Select livre / commande * 100 as pourcent_livraison from
   join livraisons_produit on livraisons_produit.FK_LIVRAISON = livraisons.ID
   where FK_CMD = 1 
   and livree = 1);
+  
+  -- Select sum par user + nombre
+  Select users.id as usr_id, SUM(qte*prix_vente) as sum_user,
+(select count(1) from commande where fk_user = users.id) as count_cmd
+from users
+left join commande on commande.fk_user = users.id
+left join commande_produit on commande_produit.fk_cmd = commande.id
+left join produit on commande_produit.fk_produit = produit.id
+group by users.id
+
+-- Select Benefice
+ Select SUM(total) as CA, SUM(benefice) as benefice from (
+   Select SUM(total) as total, SUM(total-prix_coutant) as benefice, cmd_id from (
+     Select users.password, users.nom, commande.id as cmd_id, produit.id as prd_id, 
+      produit.nom as prd_nom, prix_vente, qte, (qte*prix_vente) as total,
+      (qte*prix_achat) as prix_coutant
+      from commande_produit
+      join commande on fk_cmd = commande.id
+      join users on commande.fk_user = users.id
+      join produit on produit.id = commande_produit.fk_produit
+      join produit_fournisseur on commande_produit.fk_produit = produit_fournisseur.fk_produit
+  )
+  group by cmd_id
+);
